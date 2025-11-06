@@ -1,0 +1,56 @@
+# Node / Next.js
+node_modules/
+.next/
+out/
+.vercel/
+.turbo/
+coverage/
+.eslintcache
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# OS / Editor
+.DS_Store
+*.swp
+.idea/
+.vscode/
+
+# Env files (keep example tracked)
+.env
+.env.*
+!.env.example
+
+# Prisma
+.prisma/
+prisma/*.db
+prisma/*.db-journal
+
+# TypeScript
+*.tsbuildinfo
+
+# Python (newsagent)
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.hypothesis/
+.venv/
+venv/
+newsagent/.venv/
+
+# Worker / Backend (deployed separately on Railway)
+newsagent/
+
+# Builds / Dist
+build/
+dist/
+
+

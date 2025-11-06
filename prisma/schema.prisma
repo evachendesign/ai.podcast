@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model Channel {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @default(now()) @updatedAt
+  name      String
+  news_url  String    @default("")
+  isActive  Boolean   @default(true)
+  userId    String
+  topic     String    @default("")
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  episodes  Episode[]
+  jobs      Job[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([isActive])
+}
+
+model Episode {
+  id          String        @id @default(cuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @default(now()) @updatedAt
+  title       String?
+  durationSec Int?
+  publishedAt DateTime?
+  channelId   String
+  script      String
+  error       String?
+  audioKey    String?
+  status      episodestatus @default(QUEUED)
+  channel     Channel       @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  jobs        Job[]
+
+  @@index([channelId])
+}
+
+model User {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  clerkUserId String?   @unique
+  isGuest     Boolean   @default(true)
+  email       String?
+  displayName String?
+  channels    Channel[]
+
+  @@index([email])
+}
+
+model Job {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  channelId   String
+  episodeId   String?
+  type        String    @default("channel_generation")
+  payload     Json
+  result      Json?
+  error       String?
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(3)
+  priority    Int       @default(0)
+  dedupeKey   String?
+  queuedAt    DateTime  @default(now())
+  startedAt   DateTime?
+  finishedAt  DateTime?
+  status      jobstatus @default(QUEUED)
+  channel     Channel   @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  episode     Episode?  @relation(fields: [episodeId], references: [id])
+
+  @@index([channelId])
+}
+
+enum episodestatus {
+  QUEUED
+  PROCESSING
+  READY
+  FAILED
+}
+
+enum jobstatus {
+  QUEUED
+  RUNNING
+  COMPLETE
+  FAILED
+}
